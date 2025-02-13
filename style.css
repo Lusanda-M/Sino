@@ -180,3 +180,10 @@ body {
         font-size: 1.1em;
     }
 }
+.reset-info {
+    font-size: 0.9em;
+    color: #777; /* Similar color to timer text */
+    margin-top: 10px; /* Space above the reset info */
+    margin-bottom: 15px; /* Space below the reset info */
+    font-style: italic; /* Optional: Italic style to differentiate it */
+}
