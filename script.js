@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dailyMessageElement = document.getElementById('dailyMessage');
     const countdownTimerElement = document.getElementById('countdownTimer');
     const momentButton = document.getElementById('momentButton');
-    const lastResetInfoElement = document.getElementById('lastResetInfo'); // New element
+    const lastResetInfoElement = document.getElementById('lastResetInfo');
 
     const messagesLocalStorageKey = 'dailySunshineMessages';
     const lastResetTimeStorageKey = 'lastSunshineResetTime';
@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to set and display the daily message
     function setDailyMessage(messages) {
+        console.log("setDailyMessage function called"); // DEBUG LOG
+        if (!messages) {
+            console.error("Error: messages array is not available in setDailyMessage!"); // DEBUG LOG
+            return; // Exit if messages is not available
+        }
+
         let lastResetTime = localStorage.getItem(lastResetTimeStorageKey);
         let currentMessage = localStorage.getItem(messagesLocalStorageKey);
         let nextResetTime;
@@ -88,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let nextResetTime = setDailyMessage(messages); // Get next reset time after setting message
             updateCountdown(nextResetTime); // Initial countdown with correct next reset time
             momentButton.addEventListener('click', () => {
+                console.log("Moment Button Clicked!"); // DEBUG LOG
                 nextResetTime = setDailyMessage(messages); // Update message and get new reset time
                 updateCountdown(nextResetTime); // Update countdown immediately after button click
             });
