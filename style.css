@@ -1,0 +1,182 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #BDE0FE; /* Light Blue - body background */
+    margin: 0;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.cloud-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.cloud {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.7;
+    top: 0;
+    background-size: contain;
+    height: auto;
+}
+
+/* Cloud Layers - Parallax Depth - Sizes remain */
+.cloud-near {
+    width: 40vw;
+    height: 40vw;
+    animation: cloud-move-near 30s linear infinite;
+    opacity: 0.8;
+}
+
+.cloud-mid {
+    width: 20vw;
+    height: 20vw;
+    animation: cloud-move-mid 60s linear infinite;
+    opacity: 0.6;
+}
+
+.cloud-far {
+    width: 10vw;
+    height: 10vw;
+    animation: cloud-move-far 120s linear infinite;
+    opacity: 0.4;
+}
+
+/* Cloud Images - unchanged */
+.cloud1 { background-image: url('cloud1.png'); }
+.cloud2 { background-image: url('cloud2.png'); }
+.cloud3 { background-image: url('cloud3.png'); }
+.cloud4 { background-image: url('cloud4.png'); }
+.cloud5 { background-image: url('cloud5.png'); }
+.cloud6 { background-image: url('cloud6.png'); }
+.cloud7 { background-image: url('cloud7.png'); }
+.cloud8 { background-image: url('cloud8.png'); }
+
+
+/* Animations - unchanged */
+@keyframes cloud-move-near {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100vw); }
+}
+
+@keyframes cloud-move-mid {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100vw); }
+}
+
+@keyframes cloud-move-far {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100vw); }
+}
+
+
+.message-container {
+    background-color: #FFC8DD; /* Light Pink - Message Container */
+    padding: 45px 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    text-align: center;
+    max-width: 90%;
+    margin: 15px;
+    position: relative;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-text {
+    font-size: 2.2em;
+    color: white; /* **White Header Text** */
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+#dailyMessage {
+    font-size: 1.5em;
+    line-height: 1.8;
+    color: #444;
+    background-color: rgba(162, 210, 255, 0.3); /* Light Blue with Transparency for Message Highlight */
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+#countdownTimer {
+    font-size: 1.2em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+#momentButton {
+    background-color: #FFAFCC;
+    color: #222;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+#momentButton:hover {
+    background-color: #FFDAE9;
+}
+
+#momentButton:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 175, 204, 0.5);
+}
+
+/* New CSS for the Sun */
+.sun {
+    position: fixed; /* Fixed position relative to viewport */
+    top: -10px;      /* Changed to negative value to move it up */
+    left: -10px;     /* Changed to negative value to move it left */
+    width: 60px;
+    height: 60px;
+    background-color: #FFD700;
+    border-radius: 50%;
+    box-shadow: 0 0 20px 10px rgba(255, 215, 0, 0.5);
+    opacity: 0.8;
+    z-index: 0;
+}
+
+
+/* Media Query for smaller screens - unchanged */
+@media (max-width: 480px) {
+    .message-container {
+        padding: 35px 25px;
+    }
+
+    .header-text {
+        font-size: 1.9em;
+        margin-bottom: 20px;
+    }
+
+    #dailyMessage {
+        font-size: 1.25em;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    #countdownTimer {
+        font-size: 1em;
+    }
+
+    #momentButton {
+        padding: 14px 28px;
+        font-size: 1.1em;
+    }
+}
