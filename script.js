@@ -1,89 +1,47 @@
 document.addEventListener('DOMContentLoaded', function() {
     const dailyMessageElement = document.getElementById('dailyMessage');
-    const countdownTimerElement = document.getElementById('countdownTimer');
     const momentButton = document.getElementById('momentButton');
-    const lastResetInfoElement = document.getElementById('lastResetInfo');
 
-    const messagesLocalStorageKey = 'dailySunshineMessages';
-    const lastResetTimeStorageKey = 'lastSunshineResetTime';
+    const messagesLocalStorageKey = 'dailySunshineMessage'; // Simplified key
+    const messageDateStorageKey = 'dailySunshineMessageDate'; // Key for date
 
-    // Function to convert UTC time to UCT+2 timezone and format
-    function formatUCT2Time(utcTimestamp) {
-        const utcDate = new Date(utcTimestamp);
-        const uct2Offset = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-        const uct2Date = new Date(utcDate.getTime() + uct2Offset);
-
-        const options = {
-            year: 'numeric', month: 'short', day: 'numeric',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-            timeZone: 'UTC', // Keep it UTC for formatting, display as UCT+2 textually
-            timeZoneName: 'shortOffset' // e.g., 'GMT+2'
-        };
-        return uct2Date.toLocaleString('en-US', options).replace('GMT+2', 'UCT+2'); //replace to show UCT+2
+    // Function to get current date in UCT+2 timezone (YYYY-MM-DD format)
+    function getUCT2DateString() {
+        const nowUtc = new Date();
+        const uct2Offset = 2 * 60 * 60 * 1000;
+        const uct2Date = new Date(nowUtc.getTime() + uct2Offset);
+        const year = uct2Date.getFullYear();
+        const month = String(uct2Date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const day = String(uct2Date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
-
 
     // Function to set and display the daily message
     function setDailyMessage(messages) {
-        console.log("setDailyMessage function called"); // DEBUG LOG
-        if (!messages) {
-            console.error("Error: messages array is not available in setDailyMessage!"); // DEBUG LOG
-            return; // Exit if messages is not available
-        }
+        let storedMessage = localStorage.getItem(messagesLocalStorageKey);
+        let storedMessageDate = localStorage.getItem(messageDateStorageKey);
+        const todayDateUCT2 = getUCT2DateString();
+        const currentHourUCT2 = new Date(Date.now() + (2 * 60 * 60 * 1000)).getUTCHours(); //Get current hour in UCT+2
 
-        let lastResetTime = localStorage.getItem(lastResetTimeStorageKey);
-        let currentMessage = localStorage.getItem(messagesLocalStorageKey);
-        let nextResetTime;
 
-        const nowUtc = Date.now(); // Current time in UTC
-
-        if (lastResetTime) {
-            lastResetTime = parseInt(lastResetTime, 10); // Parse from string to number (timestamp)
-            const timeSinceReset = nowUtc - lastResetTime;
-            const twentyFourHoursMs = 24 * 60 * 60 * 1000;
-
-            if (timeSinceReset >= twentyFourHoursMs) {
-                // 24 hours or more have passed, reset message
+        if (storedMessageDate !== todayDateUCT2) {
+            // It's a new day (or date in localStorage is different), reset message if it's 8 AM or later
+            if (currentHourUCT2 >= 8) {
                 const randomIndex = Math.floor(Math.random() * messages.length);
-                currentMessage = messages[randomIndex];
-                lastResetTime = nowUtc; // Reset to current UTC time
-                localStorage.setItem(messagesLocalStorageKey, currentMessage);
-                localStorage.setItem(lastResetTimeStorageKey, lastResetTime.toString());
+                storedMessage = messages[randomIndex];
+                localStorage.setItem(messagesLocalStorageKey, storedMessage);
+                localStorage.setItem(messageDateStorageKey, todayDateUCT2); // Store today's date
+            } else if (!storedMessage) {
+                // If before 8 AM and no stored message (first visit of the day before 8 AM), set initial message
+                 const randomIndex = Math.floor(Math.random() * messages.length);
+                storedMessage = messages[randomIndex];
+                localStorage.setItem(messagesLocalStorageKey, storedMessage);
+                localStorage.setItem(messageDateStorageKey, todayDateUCT2); // Store today's date
             }
-             nextResetTime = lastResetTime + twentyFourHoursMs; //Calculate next reset time
-
-        } else {
-            // First visit or no reset time set yet
-            const randomIndex = Math.floor(Math.random() * messages.length);
-            currentMessage = messages[randomIndex];
-            lastResetTime = nowUtc; // Set initial reset time to current UTC
-            localStorage.setItem(messagesLocalStorageKey, currentMessage);
-            localStorage.setItem(lastResetTimeStorageKey, lastResetTime.toString());
-            nextResetTime = lastResetTime + (24 * 60 * 60 * 1000); // Calculate initial next reset
         }
 
-        dailyMessageElement.textContent = currentMessage;
 
-        const lastResetTimeUCT2Formatted = formatUCT2Time(lastResetTime);
-        lastResetInfoElement.textContent = `Last message reset: ${lastResetTimeUCT2Formatted}. Current message: "${currentMessage}"`;
-        // No need to return currentMessage anymore, it's set in localStorage
-         return nextResetTime; // Return next reset time for countdown
-    }
-
-
-    function updateCountdown(nextResetTime) { // Take nextResetTime as argument
-        const now = new Date();
-        let timeLeft = nextResetTime - now.getTime(); // Use nextResetTime for countdown
-
-        if (timeLeft < 0) {
-            timeLeft = 0; // Prevent negative time
-        }
-
-        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-        countdownTimerElement.textContent = `Time until next sunshine: ${hours}h ${minutes}m ${seconds}s`;
+        dailyMessageElement.textContent = storedMessage; // Display stored message (or newly set one)
     }
 
 
@@ -91,14 +49,15 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch('messages.json')
         .then(response => response.json())
         .then(messages => {
-            let nextResetTime = setDailyMessage(messages); // Get next reset time after setting message
-            updateCountdown(nextResetTime); // Initial countdown with correct next reset time
-            momentButton.addEventListener('click', () => {
-                console.log("Moment Button Clicked!"); // DEBUG LOG
-                nextResetTime = setDailyMessage(messages); // Update message and get new reset time
-                updateCountdown(nextResetTime); // Update countdown immediately after button click
+            setDailyMessage(messages); // Set initial daily message on page load
+
+            momentButton.addEventListener('click', () => { // Button now just gets a new random message
+                const randomIndex = Math.floor(Math.random() * messages.length);
+                const newMessage = messages[randomIndex];
+                dailyMessageElement.textContent = newMessage;
+                localStorage.setItem(messagesLocalStorageKey, newMessage); // Update stored message immediately
+                localStorage.setItem(messageDateStorageKey, getUCT2DateString()); //Also update date to today when button is clicked, so next load before 8am will not change it again
             });
-            setInterval(() => updateCountdown(nextResetTime), 1000); // Set interval with next reset time
         })
         .catch(error => {
             console.error('Error fetching messages:', error);
