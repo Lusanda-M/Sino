@@ -187,3 +187,10 @@ body {
     margin-bottom: 15px; /* Space below the reset info */
     font-style: italic; /* Optional: Italic style to differentiate it */
 }
+.ps-message {
+    font-size: 0.7em; /* Very small font size */
+    color: #f0f0f0; /* Very light gray - blends with very pale peach background if you are still using that, adjust if needed */
+    text-align: center; /* Center align at the bottom */
+    margin-top: 30px; /* Add some space above it to separate from the message container */
+    opacity: 0.6; /* Even more subtle with slight transparency */
+}
